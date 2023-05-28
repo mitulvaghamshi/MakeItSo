@@ -1,12 +1,12 @@
 # Make it So
 
-Building an Android app with Jetpack Compose and Firebase
+Building an Android app with Jetpack Compose and Firebase - The Firebase Blog.
 
 The app we are going to build here is called Make It So. It’s a simple to-do list application that allows the user to add and edit to-do items, add flags, priorities and due dates, and mark the tasks as completed.
 
-This is the first part of a series of articles that dive into creating a new Android application from scratch using Jetpack Compose for the user interface and some other tools offered by Google, like Firebase Authentication, Crashlytics, Cloud Firestore and Hilt.
+This is the final (modified) app of the series that dive into creating a new Android application from scratch using Jetpack Compose for the user interface and some other tools offered by Google, like Firebase Authentication, Crashlytics, Cloud Firestore and Hilt.
 
-[Start Tutorial at](https://firebase.blog/posts/2022/04/building-an-app-android-jetpack-compose-firebase) Firebase Blog.
+[Start Tutorial](https://firebase.blog/posts/2022/04/building-an-app-android-jetpack-compose-firebase) at Firebase Blog.
 
 ## Preview
 
@@ -48,7 +48,9 @@ FirebaseFirestore.getInstance().setFirestoreSettings(settings)
 
 ## Extras
 
+Sometimes the port remains occupied in case of abnormal process termination, to find and close the process use the below pair of commands.
+
 ```console
 lsof -i tcp:port
-kill [-15|-3|-9] port
+kill [-15|-3|-9] pid
 ```
