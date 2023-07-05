@@ -16,7 +16,7 @@ class SettingsViewModel @Inject constructor(
     logService: LogService,
     private val accountService: AccountService,
     private val storageService: StorageService,
-) : TodoViewModel(logService) {
+) : TodoViewModel(logService = logService) {
     val uiState = accountService.currentUser.map {
         SettingsUiState(isAnonymousAccount = it.isAnonymous)
     }

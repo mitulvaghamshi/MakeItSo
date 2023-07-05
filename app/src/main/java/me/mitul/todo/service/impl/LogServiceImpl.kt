@@ -7,5 +7,5 @@ import javax.inject.Inject
 
 class LogServiceImpl @Inject constructor() : LogService {
     override fun logNonFatalCrash(throwable: Throwable) =
-        Firebase.crashlytics.recordException(/* throwable = */ throwable)
+        Firebase.crashlytics.recordException(throwable)
 }

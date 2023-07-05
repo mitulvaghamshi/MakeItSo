@@ -1,7 +1,7 @@
 package me.mitul.todo.app
 
 import android.content.res.Resources
-import androidx.compose.material.ScaffoldState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Stable
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
@@ -12,7 +12,7 @@ import me.mitul.todo.common.SnackBarMessage.Companion.toMessage
 
 @Stable
 class AppState(
-    val scaffoldState: ScaffoldState,
+    val snackBarHostState: SnackbarHostState,
     val navController: NavHostController,
     private val snackBarManager: SnackBarManager,
     private val resources: Resources,
@@ -22,7 +22,7 @@ class AppState(
         coroutineScope.launch {
             snackBarManager.snackBarMessages.filterNotNull().collect { snackBarMessage ->
                 val text = snackBarMessage.toMessage(resources = resources)
-                scaffoldState.snackbarHostState.showSnackbar(message = text)
+                snackBarHostState.showSnackbar(message = text)
             }
         }
     }

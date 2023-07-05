@@ -16,21 +16,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-val BrightOrange = Color(0xFFFF8A65)
-val MediumOrange = Color(0xFFFFA000)
-val DarkOrange = Color(0xFFF57C00)
-
-private val DarkColorScheme = darkColorScheme(
-    primary = BrightOrange,
-    secondary = DarkOrange,
-    primaryContainer = MediumOrange,
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = BrightOrange,
-    secondary = DarkOrange,
-    primaryContainer = MediumOrange,
-)
+private val DarkColorScheme = darkColorScheme()
+private val LightColorScheme = lightColorScheme()
 
 @Composable
 fun MakeItSoTheme(

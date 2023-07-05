@@ -4,6 +4,11 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,13 +25,13 @@ import me.mitul.todo.extension.card
 import me.mitul.todo.R.drawable.ic_check as AppIcon
 import me.mitul.todo.R.string.app_name as AppName
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@ExperimentalMaterialApi
 fun EditorCard(
     @StringRes title: Int,
     @DrawableRes icon: Int,
-    value: String = "",
-    color: Color = MaterialTheme.colors.onSurface,
+    value: String? = "",
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
     onClick: () -> Unit,
 ) = Card(modifier = Modifier.card(), onClick = onClick) {
     Row(
@@ -35,10 +40,10 @@ fun EditorCard(
             .padding(all = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(Modifier.weight(1f)) {
-            Text(text = stringResource(id = title), color = color)
+        Column(Modifier.weight(weight = 1f)) {
+            Text(text = stringResource(id = title), color = contentColor)
         }
-        if (value.isNotBlank()) {
+        if (!value.isNullOrEmpty()) {
             Text(
                 text = value,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp)
@@ -47,24 +52,23 @@ fun EditorCard(
         Icon(
             painter = painterResource(id = icon),
             contentDescription = "Icon",
-            tint = color,
+            tint = contentColor,
         )
     }
 }
 
 @Composable
-@ExperimentalMaterialApi
 fun AlertCard(
     @StringRes label: Int,
     @DrawableRes icon: Int,
     @StringRes alertTitle: Int,
     @StringRes alertDescription: Int,
     @StringRes confirmText: Int,
-    labelColor: Color = MaterialTheme.colors.onSurface,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
     onConfirm: () -> Unit,
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    EditorCard(title = label, icon = icon, color = labelColor) {
+    EditorCard(title = label, icon = icon, contentColor = contentColor) {
         showDialog = true
     }
     if (showDialog) {
@@ -74,8 +78,8 @@ fun AlertCard(
             confirmText = confirmText,
             onDismiss = { showDialog = false },
             onConfirm = {
-                onConfirm()
                 showDialog = false
+                onConfirm()
             }
         )
     }
@@ -83,10 +87,8 @@ fun AlertCard(
 
 @Preview
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
 private fun EditorCard_Preview() = EditorCard(
     title = AppName,
     icon = AppIcon,
     value = "This is basic Card",
-    color = Color.Green
 ) {}

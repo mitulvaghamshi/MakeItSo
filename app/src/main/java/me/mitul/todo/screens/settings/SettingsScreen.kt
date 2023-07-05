@@ -5,8 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -16,8 +15,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import me.mitul.todo.R
 import me.mitul.todo.composable.AlertCard
-import me.mitul.todo.composable.AppBar
 import me.mitul.todo.composable.EditorCard
+import me.mitul.todo.composable.LargeAppBar
 import me.mitul.todo.extension.spacer
 import me.mitul.todo.R.drawable as AppIcon
 import me.mitul.todo.R.string as AppText
@@ -28,7 +27,8 @@ fun SettingsScreen(
     onSignOff: (String) -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.uiState.collectAsState(initial = SettingsUiState(false))
+    val uiState by viewModel.uiState
+        .collectAsState(initial = SettingsUiState(isAnonymousAccount = false))
     SettingsScreen(
         onSignIn = { viewModel.onNewLogin(push = onSignOn) },
         onSignUp = { viewModel.onNewSignUp(push = onSignOn) },
@@ -39,7 +39,6 @@ fun SettingsScreen(
 }
 
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
 private fun SettingsScreen(
     onSignIn: () -> Unit,
     onSignUp: () -> Unit,
@@ -52,7 +51,7 @@ private fun SettingsScreen(
         .verticalScroll(state = rememberScrollState()),
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
-    AppBar(title = AppText.settings)
+    LargeAppBar(title = AppText.settings)
     Spacer(modifier = Modifier.spacer())
     if (isAnonymous) {
         EditorCard(
@@ -77,7 +76,7 @@ private fun SettingsScreen(
         AlertCard(
             label = AppText.delete_my_account,
             icon = AppIcon.ic_delete_my_account,
-            labelColor = MaterialTheme.colors.error,
+            contentColor = MaterialTheme.colorScheme.error,
             alertTitle = AppText.delete_account_title,
             alertDescription = AppText.delete_account_description,
             confirmText = R.string.delete_my_account,
@@ -86,10 +85,22 @@ private fun SettingsScreen(
     }
 }
 
-@Composable
 @Preview(showBackground = true)
-private fun SettingsScreen_Preview() = SettingsScreen({}, {}, {}, {}, false)
+@Composable
+private fun SettingsScreen_Preview() = SettingsScreen(
+    onSignIn = {},
+    onSignUp = {},
+    onSignOut = {},
+    onDelete = {},
+    isAnonymous = false
+)
 
-@Composable
 @Preview(showBackground = true)
-private fun SettingsScreenAnonymous_Preview() = SettingsScreen({}, {}, {}, {}, true)
+@Composable
+private fun SettingsScreenAnonymous_Preview() = SettingsScreen(
+    onSignIn = {},
+    onSignUp = {},
+    onSignOut = {},
+    onDelete = {},
+    isAnonymous = true
+)

@@ -5,23 +5,26 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import me.mitul.todo.common.TASK_DEFAULT_ID
 import me.mitul.todo.extension.idFromParameter
 import me.mitul.todo.model.Task
+import me.mitul.todo.screens.TodoViewModel
 import me.mitul.todo.service.LogService
 import me.mitul.todo.service.StorageService
-import me.mitul.todo.screens.TodoViewModel
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 
 @HiltViewModel
 class EditTaskViewModel @Inject constructor(
     logService: LogService,
     private val storageService: StorageService,
-) : TodoViewModel(logService) {
+) : TodoViewModel(logService = logService) {
     val task = mutableStateOf(value = Task())
 
     fun initialize(taskId: String) = launchCatching {
         if (taskId != TASK_DEFAULT_ID) {
-            task.value = storageService.getTask(taskId = taskId.idFromParameter()) ?: Task()
+            task.value = storageService
+                .getTask(taskId = taskId.idFromParameter()) ?: Task()
         }
     }
 
@@ -37,12 +40,11 @@ class EditTaskViewModel @Inject constructor(
         task.value = task.value.copy(url = newValue)
     }
 
-    fun onDateChange(newValue: Long) {
-        val calendar = Calendar.getInstance(/* zone = */ TimeZone.getTimeZone(UTC))
-        calendar.timeInMillis = newValue
-        val newDueDate =
-            SimpleDateFormat(/* pattern = */ DATE_FORMAT, /* locale = */ Locale.ENGLISH)
-                .format(/* date = */ calendar.time)
+    fun onDateChange(year: Int, month: Int, day: Int) {
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone(UTC))
+        calendar.set(year, month, day)
+        val newDueDate = SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH)
+            .format(calendar.time)
         task.value = task.value.copy(dueDate = newDueDate)
     }
 
@@ -70,7 +72,8 @@ class EditTaskViewModel @Inject constructor(
         pop()
     }
 
-    private fun Int.toClockPattern(): String = if (this < 10) "0$this" else "$this"
+    private fun Int.toClockPattern(): String =
+        if (this < 10) "0$this" else "$this"
 
     companion object {
         private const val UTC = "UTC"

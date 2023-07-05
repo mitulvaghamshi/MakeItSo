@@ -1,13 +1,13 @@
 package me.mitul.todo.screens.edit_task
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,28 +16,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.TimeFormat
-import me.mitul.todo.composable.Appbar
+import me.mitul.todo.composable.LargeAppbar
 import me.mitul.todo.composable.BasicField
 import me.mitul.todo.composable.DropdownList
 import me.mitul.todo.composable.EditorCard
 import me.mitul.todo.extension.spacer
 import me.mitul.todo.model.Priority
 import me.mitul.todo.model.Task
+import java.util.Calendar
+import java.util.Date
 import me.mitul.todo.R.drawable as AppIcon
 import me.mitul.todo.R.string as AppText
 
 @Composable
-@ExperimentalMaterialApi
 fun EditTaskScreen(
     id: String,
-    onComplete: () -> Unit,
+    onSave: () -> Unit,
     viewModel: EditTaskViewModel = hiltViewModel(),
 ) {
     val task by viewModel.task
-    LaunchedEffect(key1 = Unit) { viewModel.initialize(taskId = id) }
     EditTaskScreen(
         task = task,
         onTitleChange = viewModel::onTitleChange,
@@ -47,33 +44,35 @@ fun EditTaskScreen(
         onTimeChange = viewModel::onTimeChange,
         onPriorityChange = viewModel::onPriorityChange,
         onFlagChange = viewModel::onFlagChange,
-        onDone = { viewModel.onDoneClick(pop = onComplete) }
+        onDone = { viewModel.onDoneClick(pop = onSave) }
     )
+    LaunchedEffect(key1 = Unit) { viewModel.initialize(taskId = id) }
 }
 
 @Composable
-@ExperimentalMaterialApi
 private fun EditTaskScreen(
     task: Task,
     onTitleChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onUrlChange: (String) -> Unit,
-    onDateChange: (Long) -> Unit,
+    onDateChange: (Int, Int, Int) -> Unit,
     onTimeChange: (Int, Int) -> Unit,
     onPriorityChange: (String) -> Unit,
     onFlagChange: (String) -> Unit,
     onDone: () -> Unit,
 ) {
     val context: Context = LocalContext.current
-    val selectedPriority = Priority.getByName(name = task.priority).name
-    val selectedFlag = EditFlagOption.getByCheckedState(checkedState = task.flag).name
+    val selectedPriority = Priority
+        .getByName(name = task.priority).name
+    val selectedFlag = EditFlagOption
+        .getByCheckedState(checkedState = task.flag).name
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(state = rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Appbar(
+        LargeAppbar(
             title = AppText.edit_task,
             icon = AppIcon.ic_check,
             onClick = onDone,
@@ -110,39 +109,60 @@ private fun EditTaskScreen(
             showTimePicker(context = context, onTimeChange = onTimeChange)
         }
         DropdownList(
-            title = AppText.priority,
             options = Priority.getOptions(),
+            title = AppText.priority,
             selected = selectedPriority,
-            onSelect = onPriorityChange
+            onSelect = onPriorityChange,
         )
         DropdownList(
-            title = AppText.flag,
             options = EditFlagOption.getOptions(),
+            title = AppText.flag,
             selected = selectedFlag,
-            onSelect = onFlagChange
+            onSelect = onFlagChange,
         )
     }
 }
 
-private fun showDatePicker(context: Context?, onDateChange: (Long) -> Unit) {
-    val picker = MaterialDatePicker.Builder.datePicker().build()
-    (context as AppCompatActivity).let {
-        picker.show(/* manager = */ it.supportFragmentManager, /* tag = */ picker.toString())
-        picker.addOnPositiveButtonClickListener { timeInMillis -> onDateChange(timeInMillis) }
-    }
+private fun showDatePicker(
+    context: Context,
+    onDateChange: (Int, Int, Int) -> Unit,
+) {
+    val calendar = Calendar.getInstance()
+    calendar.time = Date()
+    DatePickerDialog(
+        context,
+        { _, year, month, day -> onDateChange(year, month, day) },
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    ).show()
 }
 
-private fun showTimePicker(context: Context, onTimeChange: (Int, Int) -> Unit) {
-    val picker = MaterialTimePicker.Builder().setTimeFormat(/* format = */ TimeFormat.CLOCK_24H)
-        .build()
-    (context as AppCompatActivity).let {
-        picker.show(/* manager = */it.supportFragmentManager,/* tag = */picker.toString())
-        picker.addOnPositiveButtonClickListener { onTimeChange(picker.hour, picker.minute) }
-    }
+private fun showTimePicker(
+    context: Context,
+    onTimeChange: (Int, Int) -> Unit,
+) {
+    val calendar = Calendar.getInstance()
+    calendar.time = Date()
+    TimePickerDialog(
+        context,
+        { _, hour, minute -> onTimeChange(hour, minute) },
+        calendar.get(Calendar.HOUR_OF_DAY),
+        calendar.get(Calendar.MINUTE),
+        true
+    ).show()
 }
 
-@Composable
 @Preview(showBackground = true)
-@OptIn(ExperimentalMaterialApi::class)
-private fun EditTaskScreenPreview() =
-    EditTaskScreen(Task(), {}, {}, {}, {}, { _, _ -> }, {}, {}, {})
+@Composable
+private fun EditTaskScreenPreview() = EditTaskScreen(
+    task = Task(),
+    onTitleChange = {},
+    onDescriptionChange = {},
+    onUrlChange = {},
+    onDateChange = { _, _, _ -> },
+    onTimeChange = { _, _ -> },
+    onPriorityChange = {},
+    onFlagChange = {},
+    onDone = {}
+)

@@ -16,11 +16,12 @@ import me.mitul.todo.R.string as AppText
 class LoginViewModel @Inject constructor(
     private val accountService: AccountService,
     logService: LogService,
-) : TodoViewModel(logService) {
-    var uiState = mutableStateOf(value = LoginUiState()); private set
+) : TodoViewModel(logService = logService) {
+    var uiState = mutableStateOf(value = LoginUiState())
+        private set
 
-    private val email; get() = uiState.value.email
-    private val password; get() = uiState.value.password
+    private val email get() = uiState.value.email
+    private val password get() = uiState.value.password
 
     fun onEmailChange(newValue: String) {
         uiState.value = uiState.value.copy(email = newValue)

@@ -1,6 +1,5 @@
 package me.mitul.todo.app
 
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
@@ -20,7 +19,6 @@ import me.mitul.todo.screens.sign_up.SignUpScreen
 import me.mitul.todo.screens.splash.SplashScreen
 import me.mitul.todo.screens.tasks.TasksScreen
 
-@OptIn(ExperimentalMaterialApi::class)
 fun NavGraphBuilder.navGraph(appState: AppState) {
     composable(route = SPLASH_SCREEN) {
         SplashScreen(onComplete = { route, oldRoute ->
@@ -56,7 +54,7 @@ fun NavGraphBuilder.navGraph(appState: AppState) {
         })
     ) {
         EditTaskScreen(
-            onComplete = { appState.navigateBack() },
+            onSave = { appState.navigateBack() },
             id = it.arguments?.getString(TASK_ID) ?: TASK_DEFAULT_ID
         )
     }

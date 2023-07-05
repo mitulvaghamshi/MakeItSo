@@ -17,7 +17,7 @@ class TasksViewModel @Inject constructor(
     logService: LogService,
     private val storageService: StorageService,
     private val configurationService: ConfigurationService,
-) : TodoViewModel(logService) {
+) : TodoViewModel(logService = logService) {
     val tasks = storageService.tasks
     val options = mutableStateOf<List<String>>(listOf())
 

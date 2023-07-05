@@ -1,19 +1,17 @@
 package me.mitul.todo
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.ExperimentalMaterialApi
 import dagger.hilt.android.AndroidEntryPoint
 import me.mitul.todo.app.MakeItSoApp
-import me.mitul.todo.common.Emulator
+import me.mitul.todo.common.useEmulators
 
 @AndroidEntryPoint
-@ExperimentalMaterialApi
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Emulator.useIfDebug()
+        useEmulators()
         setContent { MakeItSoApp() }
     }
 }

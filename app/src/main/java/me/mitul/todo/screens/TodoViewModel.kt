@@ -13,8 +13,13 @@ open class TodoViewModel(private val logService: LogService) : ViewModel() {
     fun launchCatching(
         snackBar: Boolean = true,
         block: suspend CoroutineScope.() -> Unit,
-    ) = viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
-        if (snackBar) SnackBarManager.showMessage(throwable.toSnackBarMessage())
-        logService.logNonFatalCrash(throwable)
-    }, block = block)
+    ) = viewModelScope.launch(
+        block = block,
+        context = CoroutineExceptionHandler { _, throwable ->
+            if (snackBar) {
+                SnackBarManager.showMessage(message = throwable.toSnackBarMessage())
+            }
+            logService.logNonFatalCrash(throwable = throwable)
+        },
+    )
 }

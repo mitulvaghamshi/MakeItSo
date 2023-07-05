@@ -4,22 +4,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Card
-import androidx.compose.material.Checkbox
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import me.mitul.todo.app.DarkOrange
 import me.mitul.todo.composable.ContextMenu
 import me.mitul.todo.extension.hasDueDate
 import me.mitul.todo.extension.hasDueTime
@@ -32,7 +29,7 @@ fun TaskItem(
     options: List<String>,
     onCheckChange: (Task) -> Unit,
     onContextMenuItemClick: (String) -> Unit,
-) = Card(modifier = Modifier.padding(start = 8.dp, top = 0.dp, end = 8.dp, bottom = 8.dp)) {
+) = Card(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -43,19 +40,26 @@ fun TaskItem(
             onCheckedChange = { onCheckChange(task) }
         )
         Column(modifier = Modifier.weight(weight = 1f)) {
-            Text(text = task.title, style = MaterialTheme.typography.subtitle2)
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text(text = getDueDateTime(task = task), fontSize = 12.sp)
-            }
+            Text(
+                text = task.title,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = getDueDateTime(task = task),
+                fontSize = 12.sp
+            )
         }
         if (task.flag) {
             Icon(
-                painter = painterResource(AppIcon.ic_flag),
+                painter = painterResource(id = AppIcon.ic_flag),
                 contentDescription = "Flag",
-                tint = DarkOrange,
+                tint = Color(color = 0xFFF57C00),
             )
         }
-        ContextMenu(actions = options, onSelect = onContextMenuItemClick)
+        ContextMenu(
+            options = options,
+            onSelect = onContextMenuItemClick
+        )
     }
 }
 
@@ -66,8 +70,8 @@ private fun getDueDateTime(task: Task): String {
     return builder.toString()
 }
 
-@Composable
 @Preview(showBackground = true)
+@Composable
 private fun TaskItem_Preview() {
     val task = Task(
         id = "1",
@@ -81,5 +85,11 @@ private fun TaskItem_Preview() {
         url = "https://www.google.com/search?q=apples"
     )
     val options = listOf("Edit item", "Delete item", "Toggle flag")
-    TaskItem(task, options, {}) {}
+
+    TaskItem(
+        task = task,
+        options = options,
+        onCheckChange = {},
+        onContextMenuItemClick = {}
+    )
 }

@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import me.mitul.todo.composable.Appbar
+import me.mitul.todo.composable.LargeAppbar
 import me.mitul.todo.extension.smallSpacer
 import me.mitul.todo.model.Task
 import me.mitul.todo.R.drawable as AppIcon
@@ -26,12 +26,11 @@ import me.mitul.todo.R.string as AppText
 
 @Composable
 fun TasksScreen(
-    onNavigate: (String) -> Unit,
+    onNavigate: (route: String) -> Unit,
     viewModel: TasksViewModel = hiltViewModel(),
 ) {
     val tasks = viewModel.tasks.collectAsStateWithLifecycle(emptyList())
     val options by viewModel.options
-
     TasksScreen(
         tasks = tasks.value,
         options = options,
@@ -54,7 +53,10 @@ private fun TasksScreen(
     onContextMenuItemClick: (String, Task) -> Unit,
 ) = Scaffold(floatingActionButton = {
     FloatingActionButton(onClick = onAddItemClick) {
-        Icon(imageVector = Icons.Filled.Add, contentDescription = "Add Task")
+        Icon(
+            imageVector = Icons.Filled.Add,
+            contentDescription = "Add Task"
+        )
     }
 }) { paddingValues ->
     Column(
@@ -62,11 +64,19 @@ private fun TasksScreen(
             .fillMaxSize()
             .padding(paddingValues = paddingValues)
     ) {
-        Appbar(title = AppText.tasks, icon = AppIcon.ic_settings, onClick = onSettingsClick)
+        LargeAppbar(
+            title = AppText.tasks,
+            icon = AppIcon.ic_settings,
+            onClick = onSettingsClick
+        )
         Spacer(modifier = Modifier.smallSpacer())
         LazyColumn {
             items(items = tasks, key = { it.id }) { task ->
-                TaskItem(task = task, options = options, onCheckChange = onCheckChange) { action ->
+                TaskItem(
+                    task = task,
+                    options = options,
+                    onCheckChange = onCheckChange
+                ) { action ->
                     onContextMenuItemClick(action, task)
                 }
             }
@@ -91,5 +101,13 @@ private fun TasksScreen_Preview() {
         )
     }
     val options = TaskActionOption.values().map { it.title }
-    TasksScreen(tasks, options, {}, {}, {}, { _, _ -> })
+
+    TasksScreen(
+        tasks = tasks,
+        options = options,
+        onCheckChange = {},
+        onSettingsClick = {},
+        onAddItemClick = {},
+        onContextMenuItemClick = { _, _ -> }
+    )
 }

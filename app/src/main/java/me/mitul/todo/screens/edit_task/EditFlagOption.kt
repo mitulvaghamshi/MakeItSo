@@ -8,7 +8,8 @@ enum class EditFlagOption {
         fun getByCheckedState(checkedState: Boolean?): EditFlagOption =
             if (checkedState == true) On else Off
 
-        fun getBooleanValue(flagOption: String): Boolean = flagOption == On.name
+        fun getBooleanValue(flagOption: String): Boolean =
+            flagOption == On.name
 
         fun getOptions(): List<String> {
             val options = mutableListOf<String>()

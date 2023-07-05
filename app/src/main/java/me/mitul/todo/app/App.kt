@@ -2,12 +2,10 @@ package me.mitul.todo.app
 
 import android.content.res.Resources
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -22,20 +20,14 @@ import me.mitul.todo.common.SPLASH_SCREEN
 import me.mitul.todo.common.SnackBarManager
 
 @Composable
-fun MakeItSoApp() = MakeItSoTheme(dynamicColor = false) {
+fun MakeItSoApp() = MakeItSoTheme {
     val appState = rememberAppState()
     Scaffold(
-        scaffoldState = appState.scaffoldState,
-        snackbarHost = { hostState ->
+        snackbarHost = {
             SnackbarHost(
-                hostState = hostState,
-                modifier = Modifier.padding(8.dp),
-                snackbar = { snackBarData ->
-                    Snackbar(
-                        snackbarData = snackBarData,
-                        contentColor = MaterialTheme.colors.onPrimary,
-                    )
-                }
+                hostState = appState.snackBarHostState,
+                modifier = Modifier.padding(all = 8.dp),
+                snackbar = { data -> Snackbar(snackbarData = data) }
             )
         }
     ) { paddingValues ->
@@ -51,11 +43,17 @@ fun MakeItSoApp() = MakeItSoTheme(dynamicColor = false) {
 
 @Composable
 private fun rememberAppState(
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    snackBarHostState: SnackbarHostState = remember { SnackbarHostState() },
     navController: NavHostController = rememberNavController(),
     snackBarManager: SnackBarManager = SnackBarManager,
     resources: Resources = LocalContext.current.resources,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
-) = remember(scaffoldState, navController, snackBarManager, resources, coroutineScope) {
-    AppState(scaffoldState, navController, snackBarManager, resources, coroutineScope)
+) = remember(snackBarHostState, navController, snackBarManager, resources, coroutineScope) {
+    AppState(
+        snackBarHostState = snackBarHostState,
+        navController = navController,
+        snackBarManager = snackBarManager,
+        resources = resources,
+        coroutineScope = coroutineScope
+    )
 }

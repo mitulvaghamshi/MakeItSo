@@ -12,36 +12,28 @@ import me.mitul.todo.service.trace
 import javax.inject.Inject
 
 class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : AccountService {
-    override val currentUserId: String
-        get() = auth.currentUser?.uid.orEmpty()
+    override val currentUserId: String get() = auth.currentUser?.uid.orEmpty()
 
-    override val hasUser: Boolean
-        get() = auth.currentUser != null
+    override val hasUser: Boolean get() = auth.currentUser != null
 
     override val currentUser: Flow<User>
         get() = callbackFlow {
             val listener = FirebaseAuth.AuthStateListener { auth ->
-                this.trySend(element = auth.currentUser?.let {
-                    User(id = it.uid, isAnonymous = it.isAnonymous)
+                this.trySend(element = auth.currentUser?.let { user ->
+                    User(id = user.uid, isAnonymous = user.isAnonymous)
                 } ?: User())
             }
-            auth.addAuthStateListener(/* listener = */ listener)
-            awaitClose {
-                auth.removeAuthStateListener(/* listener = */ listener)
-            }
+            auth.addAuthStateListener(listener)
+            awaitClose { auth.removeAuthStateListener(listener) }
         }
 
     override suspend fun authenticate(email: String, password: String) {
-        auth.signInWithEmailAndPassword(
-            /* email = */
-            email,
-            /* password = */
-            password,
-        ).await()
+        auth.signInWithEmailAndPassword(email, password)
+            .await()
     }
 
     override suspend fun sendRecoveryEmail(email: String) {
-        auth.sendPasswordResetEmail(/* email = */ email)
+        auth.sendPasswordResetEmail(email)
             .await()
     }
 
@@ -52,14 +44,8 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
 
     override suspend fun linkAccount(email: String, password: String): Unit =
         trace(LINK_ACCOUNT_TRACE) {
-            val credential = EmailAuthProvider.getCredential(
-                /* email = */
-                email,
-                /* password = */
-                password,
-            )
-
-            auth.currentUser!!.linkWithCredential(/* credential = */ credential)
+            val credential = EmailAuthProvider.getCredential(email, password)
+            auth.currentUser!!.linkWithCredential(credential)
                 .await()
         }
 

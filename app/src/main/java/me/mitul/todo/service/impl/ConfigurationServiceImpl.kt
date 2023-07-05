@@ -12,15 +12,16 @@ import javax.inject.Inject
 import me.mitul.todo.R.xml as AppConfig
 
 class ConfigurationServiceImpl @Inject constructor() : ConfigurationService {
-    private val remoteConfig
-        get() = Firebase.remoteConfig
+    private val remoteConfig get() = Firebase.remoteConfig
 
     init {
         if (BuildConfig.DEBUG) {
-            val configSettings = remoteConfigSettings { minimumFetchIntervalInSeconds = 0 }
-            remoteConfig.setConfigSettingsAsync(/* settings = */ configSettings)
+            val configSettings = remoteConfigSettings {
+                minimumFetchIntervalInSeconds = 0
+            }
+            remoteConfig.setConfigSettingsAsync(configSettings)
         }
-        remoteConfig.setDefaultsAsync(/* resourceId = */ AppConfig.remote_config_defaults)
+        remoteConfig.setDefaultsAsync(AppConfig.remote_config_defaults)
     }
 
     override suspend fun fetchConfiguration(): Boolean = trace(FETCH_CONFIG_TRACE) {

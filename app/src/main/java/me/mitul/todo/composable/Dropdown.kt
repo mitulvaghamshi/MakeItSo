@@ -1,39 +1,33 @@
 package me.mitul.todo.composable
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.Card
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.ExposedDropdownMenuDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import me.mitul.todo.R
 import me.mitul.todo.extension.card
-import me.mitul.todo.extension.contextMenu
-import me.mitul.todo.extension.dropdownSelector
 import me.mitul.todo.screens.tasks.TaskActionOption
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
 fun DropdownList(
     @StringRes title: Int,
     options: List<String>,
@@ -41,36 +35,29 @@ fun DropdownList(
     onSelect: (String) -> Unit,
 ) = Card(modifier = Modifier.card()) {
     var expanded by remember { mutableStateOf(value = false) }
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        modifier = Modifier.dropdownSelector(),
-        onExpandedChange = { expanded = !expanded }
-    ) {
-        TextField(
-            readOnly = true,
-            value = selected,
-            onValueChange = {},
-            colors = dropdownColors(),
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text(text = stringResource(id = title)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            options.forEach { option ->
-                DropdownMenuItem(onClick = {
-                    onSelect(option)
+    TextField(
+        readOnly = true,
+        value = selected,
+        onValueChange = {},
+        modifier = Modifier.fillMaxWidth(),
+        label = { Text(text = stringResource(id = title)) },
+        trailingIcon = {
+            DropDownMenu(
+                options = options,
+                expanded = expanded,
+                menuToggle = { expanded = !expanded },
+                onItemSelect = { option ->
                     expanded = false
+                    onSelect(option)
                 }) {
-                    Text(text = option)
-                }
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
             }
         }
-    }
+    )
 }
 
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
-fun ContextMenu(actions: List<String>, onSelect: (String) -> Unit) {
+fun ContextMenu(options: List<String>, onSelect: (String) -> Unit) {
     var expanded by remember { mutableStateOf(value = false) }
     var showDialog by remember { mutableStateOf(value = false) }
 
@@ -79,61 +66,57 @@ fun ContextMenu(actions: List<String>, onSelect: (String) -> Unit) {
             title = R.string.delete_this_task,
             description = R.string.delete_task_description,
             confirmText = R.string.delete_task,
-            onDismiss = { showDialog = false },
-            onConfirm = {
-                showDialog = false
-                onSelect(TaskActionOption.DeleteTask.title)
-            }
-        )
+            onDismiss = { showDialog = false }
+        ) {
+            showDialog = false
+            onSelect(TaskActionOption.DeleteTask.title)
+        }
     }
 
-    ExposedDropdownMenuBox(
+    DropDownMenu(
+        options = options,
         expanded = expanded,
-        modifier = Modifier.contextMenu(),
-        onExpandedChange = { expanded = !expanded }
+        menuToggle = { expanded = !expanded },
+        onItemSelect = { option ->
+            expanded = false
+            if (option == TaskActionOption.DeleteTask.title) {
+                showDialog = true
+            } else {
+                onSelect(option)
+            }
+        },
     ) {
         Icon(
             imageVector = Icons.Default.MoreVert,
-            contentDescription = "More",
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 0.dp)
+            contentDescription = "More task actions",
         )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            modifier = Modifier.width(180.dp),
-            onDismissRequest = { expanded = false }
-        ) {
-            actions.forEach { action ->
-                DropdownMenuItem(onClick = {
-                    expanded = false
-                    if (action == TaskActionOption.DeleteTask.title) {
-                        showDialog = true
-                    } else {
-                        onSelect(action)
-                    }
-                }) {
-                    Text(text = action)
-                }
-            }
-        }
     }
 }
 
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
-private fun dropdownColors(): TextFieldColors = ExposedDropdownMenuDefaults.textFieldColors(
-    backgroundColor = MaterialTheme.colors.onPrimary,
-    focusedIndicatorColor = Color.Transparent,
-    unfocusedIndicatorColor = Color.Transparent,
-    trailingIconColor = MaterialTheme.colors.onSurface,
-    focusedTrailingIconColor = MaterialTheme.colors.onSurface,
-    focusedLabelColor = MaterialTheme.colors.primary,
-    unfocusedLabelColor = MaterialTheme.colors.primary
-)
+private fun DropDownMenu(
+    options: List<String>,
+    expanded: Boolean,
+    menuToggle: () -> Unit,
+    onItemSelect: (String) -> Unit,
+    content: @Composable () -> Unit,
+) = Box {
+    IconButton(onClick = menuToggle, content = content)
+    DropdownMenu(expanded = expanded, onDismissRequest = menuToggle) {
+        options.forEach { action ->
+            DropdownMenuItem(
+                text = { Text(text = action) },
+                onClick = { onItemSelect(action) }
+            )
+        }
+    }
+}
 
-@Composable
 @Preview(showBackground = true)
+@Composable
 private fun DropDownList_Preview() = DropdownList(
     title = R.string.app_name,
     options = listOf("Apple", "Banana", "Mango"),
-    selected = "Apple"
-) {}
+    selected = "Apple",
+    onSelect = {},
+)

@@ -32,28 +32,28 @@ class StorageServiceImpl @Inject constructor(
 
     override suspend fun getTask(taskId: String): Task? =
         currentCollection(uid = auth.currentUserId)
-            .document(/* documentPath = */ taskId)
+            .document(taskId)
             .get()
             .await()
             .toObject()
 
     override suspend fun save(task: Task): String = trace(SAVE_TASK_TRACE) {
         currentCollection(uid = auth.currentUserId)
-            .add(/* data = */ task)
+            .add(task)
             .await()
             .id
     }
 
     override suspend fun update(task: Task): Unit = trace(UPDATE_TASK_TRACE) {
         currentCollection(uid = auth.currentUserId)
-            .document(/* documentPath = */ task.id)
-            .set(/* data = */ task)
+            .document(task.id)
+            .set(task)
             .await()
     }
 
     override suspend fun delete(taskId: String) {
         currentCollection(uid = auth.currentUserId)
-            .document(/* documentPath = */ taskId)
+            .document(taskId)
             .delete()
             .await()
     }
@@ -64,16 +64,15 @@ class StorageServiceImpl @Inject constructor(
         val matchingTasks = currentCollection(uid = userId)
             .get()
             .await()
-
         matchingTasks.map {
             it.reference.delete().asDeferred()
         }.awaitAll()
     }
 
     private fun currentCollection(uid: String): CollectionReference =
-        fireStore.collection(/* collectionPath = */ USER_COLLECTION)
-            .document(/* documentPath = */ uid)
-            .collection(/* collectionPath = */ TASK_COLLECTION)
+        fireStore.collection(USER_COLLECTION)
+            .document(uid)
+            .collection(TASK_COLLECTION)
 
     companion object {
         private const val USER_COLLECTION = "users"
