@@ -30,7 +30,7 @@ class AwesomeTest {
     @Before
     fun setup() {
         hilt.inject()
-        Emulator.useIfDebug()
+        Emulator.useEmulators()
         runBlocking {
             firestore.clearPersistence().await()
         }
